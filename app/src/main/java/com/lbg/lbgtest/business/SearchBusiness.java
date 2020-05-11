@@ -64,13 +64,12 @@ public class SearchBusiness {
 
                     @Override
                     public void onNext(SearchResult searchResult) {
-                        handleResult(searchResult.getResult(),searchType);
+                        mCommonResult.setValue(handleResult(searchResult.getResult(),searchType));
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
-                        handleError(e);
+                        mError.setValue(e.getMessage());
                     }
 
                     @Override
@@ -142,32 +141,23 @@ public class SearchBusiness {
      * Handle the response from service call
      * @param result -  result
      */
-    private void handleResult(Result result,String type){
+    private List<CommonResult> handleResult(Result result,String type){
          // process the result and put into common result to render it on UI
          SearchType searchType = SearchType.valueOf(type.toUpperCase());
-         switch (searchType){
-             case ALBUM:
-                  mCommonResult.setValue(processAlbumMatcher(result.getAlbumMatcher()));
-                 break;
-             case ARTIST:
-                 mCommonResult.setValue(processArtistMatcher(result.getArtistMatcher()));
-                 break;
-             case TRACK:
-                 mCommonResult.setValue(processTrackMatcher(result.getTrackMatcher()));
-                 break;
+        switch (searchType){
+            case ALBUM:
+                return processAlbumMatcher(result.getAlbumMatcher());
+            case ARTIST:
+                return processArtistMatcher(result.getArtistMatcher());
+            case TRACK:
+                return processTrackMatcher(result.getTrackMatcher());
+            default:
+                return null;
 
-         }
+        }
 
     }
 
-    /**
-     * Handle error from service call
-     * @param e - exception
-     */
-    private void handleError(Throwable e){
-
-        mError.setValue(e.getMessage());
-    }
 
     /**
      * Map all the option into Query map
